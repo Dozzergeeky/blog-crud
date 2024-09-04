@@ -60,6 +60,8 @@ This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-opti
 
 ## Folder Structure
 Here's an overview of the project's folder structure:
+
+```
 blog-crud/
 ├── app/
 │   ├── components/
@@ -74,7 +76,8 @@ blog-crud/
 ├── database.sqlite
 ├── package.json
 ├── README.md
-├── vercel.json
+├── vercelKV.ts
+```
 
 ## Deploy on Vercel
 
