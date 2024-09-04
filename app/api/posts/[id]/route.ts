@@ -24,6 +24,35 @@ export async function GET(
   return NextResponse.json(post);
 }
 
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const { title, content } = await request.json();
+
+  if (!title || !content) {
+    return NextResponse.json(
+      { error: "Title and content are required" },
+      { status: 400 }
+    );
+  }
+
+  const result = await db.run(
+    "UPDATE posts SET title = ?, content = ? WHERE id = ?",
+    [title, content, params.id]
+  );
+
+  if (result.changes === 0) {
+    return NextResponse.json({ error: "Post not found" }, { status: 404 });
+  }
+
+  const updatedPost = await db.get(
+    "SELECT * FROM posts WHERE id = ?",
+    params.id
+  );
+  return NextResponse.json(updatedPost);
+}
+
 export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
