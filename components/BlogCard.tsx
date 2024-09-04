@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from './ui/button'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card'
 import { ConfirmationModal } from './ConfirmationModal'
 
 interface BlogCardProps {
@@ -21,20 +22,26 @@ export default function BlogCard({ id, title, excerpt, onDelete }: BlogCardProps
   }
 
   return (
-    <div className="border p-4 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-2">{title}</h2>
-      <p className="text-muted-foreground mb-4">{excerpt}</p>
-      <div className="flex justify-between">
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-muted-foreground">{excerpt}</p>
+      </CardContent>
+      <CardFooter className="flex justify-between">
         <Button asChild variant="outline">
-          <Link href={`/post/${id}`}>View</Link>
+          <Link href={`/post/${id}`}>Read More</Link>
         </Button>
-        <Button asChild variant="outline">
-          <Link href={`/edit/${id}`}>Edit</Link>
-        </Button>
-        <Button variant="destructive" onClick={() => setIsDeleteModalOpen(true)}>
-          Delete
-        </Button>
-      </div>
+        <div className="space-x-2">
+          <Button asChild variant="outline">
+            <Link href={`/edit/${id}`}>Edit</Link>
+          </Button>
+          <Button variant="destructive" onClick={() => setIsDeleteModalOpen(true)}>
+            Delete
+          </Button>
+        </div>
+      </CardFooter>
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
@@ -42,6 +49,6 @@ export default function BlogCard({ id, title, excerpt, onDelete }: BlogCardProps
         title="Delete Post"
         description="Are you sure you want to delete this post? This action cannot be undone."
       />
-    </div>
+    </Card>
   )
 }
