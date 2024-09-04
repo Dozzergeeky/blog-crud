@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import BlogCard from "@/components/BlogCard";
@@ -12,8 +11,10 @@ interface Post {
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     fetchPosts();
   }, []);
 
@@ -27,7 +28,11 @@ export default function Home() {
     await fetch(`/api/posts/${id}`, { method: "DELETE" });
     fetchPosts();
   };
-  
+
+  if (!isMounted) {
+    return null; // or a loading spinner
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
