@@ -7,7 +7,7 @@ let db: any = null;
 async function getDB() {
   if (!db) {
     db = await open({
-      filename: "./blog.db",
+      filename: ":memory:",
       driver: sqlite3.Database,
     });
   }
