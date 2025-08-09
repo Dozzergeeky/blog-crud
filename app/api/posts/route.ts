@@ -1,27 +1,5 @@
 import { NextResponse } from 'next/server'
-import sqlite3 from 'sqlite3'
-import { open } from 'sqlite'
-
-let db: any = null;
-async function getDB() {
-  if (!db) {
-    const file = process.env.SQLITE_FILE || '/tmp/blog.db';
-    db = await open({
-      filename: file,
-      driver: sqlite3.Database
-    });
-    await db.exec(`
-      CREATE TABLE IF NOT EXISTS posts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        content TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    console.log('Database initialized at', file);
-  }
-  return db;
-}
+import { getDB } from '@/lib/db'
 
 export async function GET() {
   try {
