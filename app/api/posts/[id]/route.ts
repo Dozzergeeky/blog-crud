@@ -6,10 +6,19 @@ import { open } from "sqlite";
 let db: any = null;
 async function getDB() {
   if (!db) {
+    const file = process.env.SQLITE_FILE || '/tmp/blog.db';
     db = await open({
-      filename: ":memory:",
+      filename: file,
       driver: sqlite3.Database,
     });
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS posts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
   }
   return db;
 }
