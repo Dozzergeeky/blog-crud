@@ -1,11 +1,12 @@
 import { Pool } from 'pg';
 
 // Expect DATABASE_URL in env (Vercel + local .env.local)
-let connectionString = process.env.DATABASE_URL;
+let connectionString = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
 if (!connectionString) {
-  console.warn('[pg] DATABASE_URL env var is not set.');
+  console.error('[pg] Missing DATABASE_URL (or NEON_DATABASE_URL) environment variable.');
 }
 
+let sanitizeLogged = false;
 function sanitizeConnectionString(url?: string) {
   if (!url) return url;
   try {
@@ -13,7 +14,10 @@ function sanitizeConnectionString(url?: string) {
     // Some Neon URLs include channel_binding=require which can cause issues with certain pg client versions.
     if (u.searchParams.get('channel_binding') === 'require') {
       u.searchParams.delete('channel_binding');
-      console.warn('[pg] Removed channel_binding=require from connection string for compatibility.');
+      if (!sanitizeLogged) {
+        console.warn('[pg] Removed channel_binding=require from connection string for compatibility.');
+        sanitizeLogged = true;
+      }
     }
     return u.toString();
   } catch (e) {
@@ -28,8 +32,11 @@ let pool: Pool | null = null;
 let ensurePromise: Promise<void> | null = null;
 
 export function getPool() {
+  if (!connectionString) {
+    throw new Error('DATABASE_URL not configured');
+  }
   if (!pool) {
-  pool = new Pool({ connectionString, ssl: { rejectUnauthorized: false } });
+    pool = new Pool({ connectionString, ssl: { rejectUnauthorized: false } });
   }
   return pool;
 }
@@ -60,4 +67,23 @@ export async function ensurePostsTable() {
     })();
   }
   return ensurePromise;
+}
+
+// Minimal, safe diagnostics (no credentials) for health checks.
+export function getConnectionDiagnostics() {
+  if (!connectionString) {
+    return { hasUrl: false };
+  }
+  try {
+    const u = new URL(connectionString);
+    return {
+      hasUrl: true,
+      protocol: u.protocol.replace(':',''),
+      host: u.hostname,
+      // Detect if pointing at localhost implicitly
+      isLocal: ['localhost','127.0.0.1'].includes(u.hostname)
+    };
+  } catch {
+    return { hasUrl: true, parseError: true };
+  }
 }
