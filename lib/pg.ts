@@ -2,8 +2,12 @@ import { Pool } from 'pg';
 
 // Expect DATABASE_URL in env (Vercel + local .env.local)
 let connectionString = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
+// TEMPORARY FALLBACK (DO NOT KEEP LONG-TERM): hardcoded Neon URL used only because env vars are missing in production deployment.
+// Remove this block once DATABASE_URL is properly set in Vercel.
+const HARDCODED_FALLBACK = 'postgresql://neondb_owner:npg_FuAq7Hy9pBfK@ep-fancy-fire-ael03p55-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require';
 if (!connectionString) {
-  console.error('[pg] Missing DATABASE_URL (or NEON_DATABASE_URL) environment variable.');
+  console.warn('[pg] DATABASE_URL not found in environment; using TEMPORARY hardcoded fallback. REMOVE THIS BEFORE COMMITTING TO PUBLIC REPO.');
+  connectionString = HARDCODED_FALLBACK;
 }
 
 let sanitizeLogged = false;
