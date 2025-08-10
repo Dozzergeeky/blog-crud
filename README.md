@@ -1,6 +1,6 @@
 # Blogging Website
 
-Welcome to our modern, smooth, and fast blogging website! This project leverages the power of Next.js, shadcn, and SQLite to deliver a seamless user experience. Whether you're a developer looking to contribute or just curious about how it works, this guide will help you get started.
+Welcome to our modern, smooth, and fast blogging website! This project leverages the power of Next.js, shadcn/ui, and Postgres (Neon) to deliver a seamless user experience. Whether you're a developer looking to contribute or just curious about how it works, this guide will help you get started.
 
 ## Getting Started
 
@@ -35,8 +35,22 @@ Make sure you have the following installed on your machine:
     # Using bun
     bun install
     
-    #Basic Test Database is already created in the project. You can use it to test the project.
+    # Copy .env.example to .env.local and set DATABASE_URL to your Postgres instance.
     ```
+
+### Environment Configuration
+
+Create a `.env.local` file:
+
+```bash
+cp .env.example .env.local
+```
+
+Edit `DATABASE_URL` with your Postgres connection string (e.g. Neon):
+
+```text
+DATABASE_URL=postgresql://user:password@host/dbname?sslmode=require
+```
 
 ### Running the Development Server
 
@@ -81,9 +95,12 @@ blog-crud/
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Go to Project → Settings → Environment Variables.
+2. Add `DATABASE_URL` with the same value used locally (omit any `channel_binding=require` param).
+3. Redeploy (new build required for env var to be picked up).
+4. Verify `https://your-domain/api/health` returns `{ "status": "ok" }`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more detail.
+If you see `DATABASE_URL not configured`, the variable name, scope (Production/Preview), or redeploy step was missed.
 
 ## Learn More
 
