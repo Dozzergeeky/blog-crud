@@ -22,24 +22,26 @@ export default function BlogCard({ id, title, excerpt, onDelete }: BlogCardProps
   }
 
   return (
-    <Card>
+      <Card data-testid={`post-card-${id}`}>
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+          <CardTitle data-testid="post-title">
+            <Link href={`/post/${id}`}>{title}</Link>
+          </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-muted-foreground">{excerpt}</p>
+          <p className="text-muted-foreground" data-testid="post-excerpt">{excerpt}</p>
       </CardContent>
       <CardFooter className="flex justify-between">
         <Button asChild variant="outline">
           <Link href={`/post/${id}`}>Read More</Link>
         </Button>
         <div className="space-x-2">
-          <Button asChild variant="outline">
-            <Link href={`/edit/${id}`}>Edit</Link>
-          </Button>
-          <Button variant="destructive" onClick={() => setIsDeleteModalOpen(true)}>
-            Delete
-          </Button>
+            <Button asChild variant="outline" data-testid="post-edit-btn">
+              <Link href={`/edit/${id}`}>Edit</Link>
+            </Button>
+            <Button variant="destructive" data-testid="post-delete-btn" onClick={() => setIsDeleteModalOpen(true)}>
+              Delete
+            </Button>
         </div>
       </CardFooter>
       <ConfirmationModal

@@ -51,7 +51,7 @@ export default function ViewPost() {
               Back to Posts
             </Button>
             <Button onClick={() => router.push(`/edit/${post.id}`)}>
-              Edit Post
+              Edit
             </Button>
           </CardFooter>
         </Card>

@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
-import { getDB } from '@/lib/db'
+import { query, ensurePostsTable } from '@/lib/pg'
 
 export async function GET() {
   try {
-    const db = await getDB();
-    const posts = await db.all('SELECT * FROM posts');
-    return NextResponse.json(posts);
+  await ensurePostsTable();
+    const { rows } = await query('SELECT id, title, content, created_at FROM posts ORDER BY id DESC');
+    return NextResponse.json(rows);
   } catch (error) {
     console.error('Error fetching posts:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
@@ -14,19 +14,17 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const db = await getDB();
+  await ensurePostsTable();
     const { title, content } = await request.json();
-
     if (!title || !content) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 });
     }
-
-    const result = await db.run('INSERT INTO posts (title, content) VALUES (?, ?)', [title, content]);
-    const newPost = await db.get('SELECT * FROM posts WHERE id = ?', result.lastID);
-
-    return NextResponse.json(newPost, { status: 201 });
+    const insert = await query(
+      'INSERT INTO posts (title, content) VALUES ($1, $2) RETURNING id, title, content, created_at',
+      [title, content]
+    );
+    return NextResponse.json(insert.rows[0], { status: 201 });
   } catch (error: any) {
-    // Log error stack and message for debugging
     console.error('Error creating post:', error?.message, error?.stack);
     return NextResponse.json({ error: error?.message || 'Internal Server Error' }, { status: 500 });
   }
