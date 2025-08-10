@@ -14,5 +14,7 @@ export async function GET() {
   for (const key of CANDIDATES) {
     present[key] = typeof process.env[key] === 'string' && process.env[key]!.length > 0;
   }
-  return NextResponse.json({ present, currentNodeEnv: process.env.NODE_ENV, region: process.env.VERCEL_REGION });
+  // Collect any env keys that look like potential DB vars (name only, no values)
+  const dynamicDBKeys = Object.keys(process.env).filter(k => /DB|DATABASE|PGHOST|PGUSER/i.test(k));
+  return NextResponse.json({ present, dynamicDBKeys, currentNodeEnv: process.env.NODE_ENV, region: process.env.VERCEL_REGION });
 }
